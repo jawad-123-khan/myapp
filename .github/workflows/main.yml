@@ -1,0 +1,34 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'The URL to load in the WebView'
+        required: true
+        default: 'https://example.com'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+    
+    - name: Build APK
+      run: |
+        cd android-app
+        sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" app/src/main/java/com/example/myapp/MainActivity.java
+        ./gradlew assembleRelease
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-release.apk
+        path: app/build/outputs/apk/release/app-release.apk
