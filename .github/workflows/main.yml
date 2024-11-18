@@ -38,7 +38,7 @@ jobs:
     
     - name: Build APK
       run: |
-        cd myapp/android-app  # Update path here
+        cd myapp/app  # Update path here
         sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" app/src/main/java/com/example/myapp/MainActivity.java
         ./gradlew assembleRelease
 
@@ -46,4 +46,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: app-release.apk
-        path: myapp/android-app/app/release/app-release.apk  # Update path
+        path: myapp/app/release/app-release.apk  # Update path
