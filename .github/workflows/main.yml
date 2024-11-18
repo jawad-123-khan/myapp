@@ -45,7 +45,7 @@ jobs:
           echo "MainActivity.java not found, skipping URL replacement."
         fi
         # Go back to the root directory and run gradlew from there
-        cd ../../../../../
+        cd ../../../../../../../
         if [ -f "gradlew" ]; then
           echo "gradlew found in root directory."
         else
