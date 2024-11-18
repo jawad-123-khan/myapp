@@ -19,7 +19,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
+        java-version: '17'  # Use Java 17 instead of Java 11
         distribution: 'zulu'
         java-package: jdk
         architecture: x64
