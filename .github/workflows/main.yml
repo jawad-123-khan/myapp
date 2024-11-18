@@ -30,15 +30,18 @@ jobs:
 
     - name: Build APK
       run: |
-        cd app  # Update path if needed
-        # Check if the file exists before applying the sed command
-        if [ -f "app/src/main/java/com/example/myapp/MainActivity.java" ]; then
-          sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" app/src/main/java/com/example/myapp/MainActivity.java
+        # Navigate to the root directory, not app/
+        cd app/src/main/java/com/example/myapp  # Correct path
+        # Check if MainActivity.java exists and perform URL replacement
+        if [ -f "MainActivity.java" ]; then
+          sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" MainActivity.java
         else
           echo "MainActivity.java not found, skipping URL replacement."
         fi
-        ./gradlew assembleRelease  # Use gradlew script on Ubuntu
-    
+        # Go back to the root directory and run gradlew from there
+        cd ../../../..
+        ./gradlew assembleRelease  # Ensure you're in the root folder for gradlew to run
+
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
       with:
