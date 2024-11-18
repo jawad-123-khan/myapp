@@ -42,18 +42,11 @@ jobs:
         fi
         cd ../../../../../../../
 
+    - name: Decode keystore file
+      run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > webview.jks
+
     - name: Build APK
-      run: ./gradlew assembleRelease
-
-    - name: Sign APK
-      run: |
-        key_alias=${{ secrets.KEY_ALIAS }}
-        key_password=${{ secrets.KEY_PASSWORD }}
-        keystore_path=webview.jks
-        store_password=${{ secrets.KEYSTORE_PASSWORD }}
-
-        ./gradlew signingReport
-        ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ secrets.KEYSTORE_PATH }} -Pandroid.injected.signing.key.alias=$key_alias -Pandroid.injected.signing.store.password=$store_password -Pandroid.injected.signing.key.password=$key_password
+      run: ./gradlew assembleRelease -Pandroid.injected.signing.store.file=webview.jks -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
     - name: Upload Signed APK artifact
       uses: actions/upload-artifact@v3
