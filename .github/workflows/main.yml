@@ -46,6 +46,12 @@ jobs:
         fi
         # Go back to the root directory and run gradlew from there
         cd ../../../../../
+        if [ -f "gradlew" ]; then
+          echo "gradlew found in root directory."
+        else
+          pwd
+        fi
+
         ./gradlew assembleRelease  # Run gradlew from the root directory
 
     - name: Upload APK artifact
