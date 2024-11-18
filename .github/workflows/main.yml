@@ -46,17 +46,15 @@ jobs:
         fi
         # Go back to the root directory and run gradlew from there
         cd ../../../../../../../
-        if [ -f "gradlew" ]; then
-          echo "gradlew found in root directory."
-        else
-          echo "gradlew Not found in root directory."
-          pwd
-        fi
+        
+        # Run Gradle build
+        ./gradlew assembleRelease  # Build release APK
 
-        ./gradlew assembleRelease  # Run gradlew from the root directory
+    - name: List APK output directory
+      run: ls -R app/build/outputs/apk/
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
       with:
         name: app-release.apk
-        path: app/build/outputs/apk/release/app-release.apk  # Ensure path is correct
+        path: app/build/outputs/apk/release/app-release.apk  # Ensure correct path
