@@ -30,8 +30,14 @@ jobs:
 
     - name: Build APK
       run: |
-        # Navigate to the root directory, not app/
-        cd app/src/main/java/com/example/myapp  # Correct path
+        # Ensure gradlew is in the root and it's executable
+        if [ -f "gradlew" ]; then
+          chmod +x gradlew  # Apply execute permission if not already done
+        else
+          echo "gradlew not found!"
+          exit 1
+        fi
+        cd app/src/main/java/com/example/myapp  # Adjust path to MainActivity.java
         # Check if MainActivity.java exists and perform URL replacement
         if [ -f "MainActivity.java" ]; then
           sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" MainActivity.java
@@ -40,7 +46,7 @@ jobs:
         fi
         # Go back to the root directory and run gradlew from there
         cd ../../../..
-        ./gradlew assembleRelease  # Ensure you're in the root folder for gradlew to run
+        ./gradlew assembleRelease  # Run gradlew from the root directory
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
