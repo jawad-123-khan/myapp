@@ -16,19 +16,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        release {
-            keyAlias 'key0'
-            keyPassword 'android'
-            storeFile file('path-to-your-keystore.jks')
-            storePassword 'android'
-        }
-    }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
 
     buildTypes {
         release {
