@@ -11,73 +11,48 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-    
+
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
-        java-version: '17'  # Use Java 17 instead of Java 11
+        java-version: '17'
         distribution: 'zulu'
         java-package: jdk
         architecture: x64
-        check-latest: false
-    
+
     - name: Ensure gradlew is executable
       run: |
-        # Check if gradlew exists in the root directory
         if [ -f "./gradlew" ]; then
-          chmod +x gradlew  # Apply execute permission if not already done
+          chmod +x gradlew
         else
           echo "gradlew not found!"
           exit 1
         fi
-      env:
-        API_URL: ${{ secrets.API_URL }}  # Pass the API URL where updates will be sent
 
-    - name: Send status update - Starting APK build
+    - name: Replace URL in MainActivity
       run: |
-        curl -X POST "$API_URL/update-status" \
-        -H "Content-Type: application/json" \
-        -d '{"status": "Building APK - Setup complete."}'
-      
-    - name: Build APK
-      run: |
-        cd app/src/main/java/com/example/myapp  # Adjust path to MainActivity.java
-        # Check if MainActivity.java exists and perform URL replacement
+        cd app/src/main/java/com/example/myapp
         if [ -f "MainActivity.java" ]; then
           sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" MainActivity.java
         else
-          echo "MainActivity.java not found, skipping URL replacement."
+          echo "MainActivity.java not found!"
+          exit 1
         fi
-        # Go back to the root directory and run gradlew from there
         cd ../../../../../../../
-        
-        # Run Gradle build
-        ./gradlew assembleRelease  # Build release APK
-        
-        curl -X POST "$API_URL/update-status" \
-        -H "Content-Type: application/json" \
-        -d '{"status": "Building APK - Gradle build started."}'
 
-    - name: List APK output directory
-      run: |
-        ls -R app/build/outputs/apk/
-        
-        curl -X POST "$API_URL/update-status" \
-        -H "Content-Type: application/json" \
-        -d '{"status": "APK build completed. Listing output directory."}'
+    - name: Build APK
+      run: ./gradlew assembleRelease
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
       with:
         name: app-release.apk
-        path: app/build/outputs/apk/release/app-release-unsigned.apk  # Ensure correct path
-        
-    - name: Send status update - APK uploaded
+        path: app/build/outputs/apk/release/app-release.apk
+
+    - name: Output download URL
       run: |
-        curl -X POST "$API_URL/update-status" \
-        -H "Content-Type: application/json" \
-        -d '{"status": "APK uploaded successfully."}'
+        echo "Download URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
