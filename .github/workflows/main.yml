@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # Use Windows OS
     
     steps:
     - name: Checkout repository
@@ -20,10 +20,11 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '11'
-        distribution: 'adoptopenjdk'  # Add distribution here
+        distribution: 'adoptopenjdk'  # JDK distribution
     
     - name: Make gradlew executable
-      run: chmod +x gradlew
+      run: |
+        icacls gradlew /grant Everyone:F
     
     - name: Build APK
       run: |
