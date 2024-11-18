@@ -38,7 +38,7 @@ jobs:
     
     - name: Build APK
       run: |
-        cd myapp/app  # Update path here
+        cd app  # Update path here
         sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" app/src/main/java/com/example/myapp/MainActivity.java
         ./gradlew assembleRelease
 
