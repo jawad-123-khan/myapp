@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest  # Use Windows OS
+    runs-on: windows-latest  # Changed to use Windows as per your request
     
     steps:
     - name: Checkout repository
@@ -20,11 +20,18 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '11'
-        distribution: 'zulu'  # JDK distribution
+        distribution: 'zulu'  # Use Zulu OpenJDK here
+        java-package: jdk
+        architecture: x64
+        check-latest: false
+        server-id: github
+        server-username: GITHUB_ACTOR
+        server-password: GITHUB_TOKEN
+        overwrite-settings: true
+        job-status: success
     
     - name: Make gradlew executable
-      run: |
-        icacls gradlew /grant Everyone:F
+      run: chmod +x gradlew
     
     - name: Build APK
       run: |
