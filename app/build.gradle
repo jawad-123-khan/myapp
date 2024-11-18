@@ -19,7 +19,7 @@ android {
         release {
             keyAlias 'key0'
             keyPassword 'android'
-            storeFile file('keystore.jks')
+            storeFile file('webview.jks')
             storePassword 'android'
         }
     }
