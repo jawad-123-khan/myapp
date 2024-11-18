@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     
     steps:
     - name: Checkout repository
@@ -25,19 +25,22 @@ jobs:
         architecture: x64
         check-latest: false
     
-    - name: Make gradlew executable (Windows specific)
-      run: |
-        chmod +x gradlew  # Ensures gradlew is executable
-        if ($IsWindows) { Set-ExecutionPolicy RemoteSigned -Scope Process }  # For Windows PowerShell if needed
-    
+    - name: Make gradlew executable
+      run: chmod +x gradlew  # Ensures gradlew is executable on Linux
+
     - name: Build APK
       run: |
-        cd app  # Update this if needed based on repo structure
-        sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" app/src/main/java/com/example/myapp/MainActivity.java  # Correct path
-        ./gradlew.bat assembleRelease  # Use gradlew.bat for Windows
+        cd app  # Update path if needed
+        # Check if the file exists before applying the sed command
+        if [ -f "app/src/main/java/com/example/myapp/MainActivity.java" ]; then
+          sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" app/src/main/java/com/example/myapp/MainActivity.java
+        else
+          echo "MainActivity.java not found, skipping URL replacement."
+        fi
+        ./gradlew assembleRelease  # Use gradlew script on Ubuntu
     
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
       with:
         name: app-release.apk
-        path: app/build/outputs/apk/release/app-release.apk  # Ensure this path is correct
+        path: app/build/outputs/apk/release/app-release.apk  # Ensure path is correct
