@@ -16,9 +16,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     
-    - name: List directory structure
-      run: dir /s  # Verify the directory structure on Windows
-    
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
