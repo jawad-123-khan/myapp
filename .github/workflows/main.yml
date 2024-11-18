@@ -24,19 +24,19 @@ jobs:
         java-package: jdk
         architecture: x64
         check-latest: false
-    
-    - name: Make gradlew executable
-      run: chmod +x gradlew  # Ensures gradlew is executable on Linux
 
-    - name: Build APK
+    - name: Ensure gradlew is executable
       run: |
-        # Ensure gradlew is in the root and it's executable
-        if [ -f "gradlew" ]; then
+        # Check if gradlew exists in the root directory
+        if [ -f "./gradlew" ]; then
           chmod +x gradlew  # Apply execute permission if not already done
         else
           echo "gradlew not found!"
           exit 1
         fi
+    
+    - name: Build APK
+      run: |
         cd app/src/main/java/com/example/myapp  # Adjust path to MainActivity.java
         # Check if MainActivity.java exists and perform URL replacement
         if [ -f "MainActivity.java" ]; then
@@ -45,7 +45,7 @@ jobs:
           echo "MainActivity.java not found, skipping URL replacement."
         fi
         # Go back to the root directory and run gradlew from there
-        cd ../../../..
+        cd ../../../../../
         ./gradlew assembleRelease  # Run gradlew from the root directory
 
     - name: Upload APK artifact
