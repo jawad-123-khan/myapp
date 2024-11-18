@@ -76,6 +76,8 @@ jobs:
         name: app-release.apk
         path: app/build/outputs/apk/release/app-release-unsigned.apk  # Ensure correct path
         
+    - name: Send status update - APK uploaded
+      run: |
         curl -X POST "$API_URL/update-status" \
         -H "Content-Type: application/json" \
         -d '{"status": "APK uploaded successfully."}'
