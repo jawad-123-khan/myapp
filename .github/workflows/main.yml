@@ -10,40 +10,49 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
-    
+    runs-on: ubuntu-latest
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-    
-    - name: List directory structure
-      run: ls -R  # Helps you verify the folder structure
-    
+
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'zulu'
         java-package: jdk
         architecture: x64
-        check-latest: false
-        server-id: github
-        server-username: GITHUB_ACTOR
-        server-password: GITHUB_TOKEN
-        overwrite-settings: true
-        job-status: success
-    
-    - name: Make gradlew executable
-      run: chmod +x gradlew
-    
-    - name: Build APK
+
+    - name: Ensure gradlew is executable
       run: |
-        cd myapp/android-app  # Update path here
-        sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" app/src/main/java/com/example/myapp/MainActivity.java
-        ./gradlew assembleRelease
+        if [ -f "./gradlew" ]; then
+          chmod +x gradlew
+        else
+          echo "gradlew not found!"
+          exit 1
+        fi
+
+    - name: Replace URL in MainActivity
+      run: |
+        cd app/src/main/java/com/example/myapp
+        if [ -f "MainActivity.java" ]; then
+          sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" MainActivity.java
+        else
+          echo "MainActivity.java not found!"
+          exit 1
+        fi
+        cd ../../../../../../../
+
+    - name: Build APK
+      run: ./gradlew assembleRelease
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
       with:
         name: app-release.apk
-        path: myapp/android-app/app/build/outputs/apk/release/app-release.apk  # Update path
+        path: app/build/outputs/apk/release/app-release-unsigned.apk
+
+    - name: Output download URL
+      run: |
+        echo "Download URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
