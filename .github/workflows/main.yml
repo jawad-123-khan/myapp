@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '11'
-        distribution: 'adoptopenjdk'  # JDK distribution
+        distribution: 'zulu'  # JDK distribution
     
     - name: Make gradlew executable
       run: |
