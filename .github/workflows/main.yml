@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Signed APK
 
 on:
   workflow_dispatch:
@@ -21,8 +21,6 @@ jobs:
       with:
         java-version: '17'
         distribution: 'zulu'
-        java-package: jdk
-        architecture: x64
 
     - name: Ensure gradlew is executable
       run: |
@@ -44,20 +42,20 @@ jobs:
         fi
         cd ../../../../../../../
 
-    - name: Set up signing configuration
-      run: |
-        echo "KEYSTORE_PATH=${{ secrets.KEYSTORE_PATH }}" >> $GITHUB_ENV
-        echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
-        echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
-        echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
-
-    - name: Build signed APK
+    - name: Build APK
       run: ./gradlew assembleRelease
 
-    - name: List APK directory
-      run: ls -alh app/build/outputs/apk/release/
-      
-    - name: Upload APK artifact
+    - name: Sign APK
+      run: |
+        key_alias=${{ secrets.KEY_ALIAS }}
+        key_password=${{ secrets.KEY_PASSWORD }}
+        keystore_path=keystore.jks
+        store_password=${{ secrets.KEYSTORE_PASSWORD }}
+
+        ./gradlew signingReport
+        ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ secrets.KEYSTORE_PATH }} -Pandroid.injected.signing.key.alias=$key_alias -Pandroid.injected.signing.store.password=$store_password -Pandroid.injected.signing.key.password=$key_password
+
+    - name: Upload Signed APK artifact
       uses: actions/upload-artifact@v3
       with:
         name: app-release.apk
