@@ -17,7 +17,7 @@ jobs:
       uses: actions/checkout@v2
     
     - name: List directory structure
-      run: ls -R  # Helps you verify the folder structure
+      run: dir /s  # Verify the directory structure on Windows
     
     - name: Set up JDK
       uses: actions/setup-java@v2
@@ -27,23 +27,20 @@ jobs:
         java-package: jdk
         architecture: x64
         check-latest: false
-        server-id: github
-        server-username: GITHUB_ACTOR
-        server-password: GITHUB_TOKEN
-        overwrite-settings: true
-        job-status: success
     
-    - name: Make gradlew executable
-      run: chmod +x gradlew
+    - name: Make gradlew executable (Windows specific)
+      run: |
+        chmod +x gradlew  # Ensures gradlew is executable
+        if ($IsWindows) { Set-ExecutionPolicy RemoteSigned -Scope Process }  # For Windows PowerShell if needed
     
     - name: Build APK
       run: |
-        cd app  # Update path here
-        sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" app/src/main/java/com/example/myapp/MainActivity.java
-        ./gradlew assembleRelease
-
+        cd app  # Update this if needed based on repo structure
+        sed -i "s|PLACEHOLDER_URL|${{ github.event.inputs.url }}|g" app/src/main/java/com/example/myapp/MainActivity.java  # Correct path
+        ./gradlew.bat assembleRelease  # Use gradlew.bat for Windows
+    
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
       with:
         name: app-release.apk
-        path: myapp/app/release/app-release.apk  # Update path
+        path: app/build/outputs/apk/release/app-release.apk  # Ensure this path is correct
